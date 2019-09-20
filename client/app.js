@@ -9,11 +9,10 @@ const sendButton = document.getElementById('send-btn');
 
 // websocket init
 window.WebSocket = window.WebSocket || window.MozWebSocket;
-const connection = new WebSocket('ws://127.0.0.1:3001');
+const connection = new WebSocket('__WEBSOCKET_URL__');
 connection.binaryType = 'blob';
 let isWsOpen = false;
 
-// functions
 const someoneJoined = () => {
   const div = document.createElement('div');
   div.innerText = 'Someone joined the channel!';
@@ -26,7 +25,6 @@ const someoneMessaged = (msg) => {
   msgList.appendChild(div);
 };
 
-
 const wsSend = (type, content) => {
   if (!isWsOpen) return;
   connection.send(JSON.stringify({
@@ -35,7 +33,6 @@ const wsSend = (type, content) => {
     content,
   }));
 };
-
 
 connection.onopen = () => {
   console.log('connection opened');

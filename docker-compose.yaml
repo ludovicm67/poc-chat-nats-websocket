@@ -31,6 +31,8 @@ services:
     build: client
     ports:
       - 3000:80
+    environment:
+      - WEBSOCKET_URL=ws://127.0.0.1:3001
 
   # services
   service_capslock_mode:
