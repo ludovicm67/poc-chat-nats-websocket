@@ -1,0 +1,17 @@
+{
+  "name": "service_capslock_mode",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "nats": "^1.3.0",
+    "node-nats-streaming": "^0.2.6",
+    "uuid": "^3.3.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}

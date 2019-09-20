@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+  # messages bus
+  nats:
+    image: nats-streaming
+    command:
+      - --cluster_id=cluster-test
+      - --http_port=8222
+    ports:
+      - 4222:4222
+      - 6222:6222
+      - 8222:8222
+
+  # server
+  server:
+    image: server
+    build: server
+    ports:
+      - 3001:3001
+    environment:
+      - SERVER_PORT=3001
+      - NATS_SERVERS=nats://nats:4222
+      - CLUSTER_NAME=cluster-test
+    depends_on:
+      - nats
+
+  # client
+  client:
+    image: client
+    build: client
+    ports:
+      - 3000:80
+
+  # services
+  service_capslock_mode:
+    image: service_capslock_mode
+    build: services/capslock_mode
+    environment:
+      - NATS_SERVERS=nats://nats:4222
+      - CLUSTER_NAME=cluster-test
+      - CHANNEL_NAME=service.capslock_mode
+    depends_on:
+      - server
+  service_happy:
+    image: service_happy
+    build: services/happy
+    environment:
+      - NATS_SERVERS=nats://nats:4222
+      - CLUSTER_NAME=cluster-test
+      - CHANNEL_NAME=service.happy
+    depends_on:
+      - server
