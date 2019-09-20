@@ -31,7 +31,12 @@ wsServer.on('request', request => {
   logWithDate('ws: connection accepted');
   connection.on('message', message => {
     if (message.type != 'utf8') return;
-    const msg = JSON.parse(message.utf8Data);
+    let msg;
+    try {
+      msg = JSON.parse(message.utf8Data);
+    } catch(_e) {
+      return;
+    }
     if (msg.type === 'join') {
       Object.assign(clients[clientIndex], {
         channel: msg.channel,

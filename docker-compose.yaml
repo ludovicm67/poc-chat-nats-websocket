@@ -3,6 +3,7 @@ version: "3"
 services:
   # messages bus
   nats:
+    restart: always
     image: nats-streaming
     command:
       - --cluster_id=cluster-test
@@ -14,6 +15,7 @@ services:
 
   # server
   server:
+    restart: always
     image: server
     build: server
     ports:
@@ -27,6 +29,7 @@ services:
 
   # client
   client:
+    restart: always
     image: client
     build: client
     ports:
@@ -36,6 +39,7 @@ services:
 
   # services
   service_capslock_mode:
+    restart: always
     image: service_capslock_mode
     build: services/capslock_mode
     environment:
@@ -45,6 +49,7 @@ services:
     depends_on:
       - server
   service_happy:
+    restart: always
     image: service_happy
     build: services/happy
     environment:
