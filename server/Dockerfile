@@ -1,6 +1,6 @@
 # Build context is the repository root, because the npm workspace layout needs
 # the root manifest and lockfile to install (see compose.yaml).
-FROM node:24-alpine
+FROM node:26-alpine
 
 WORKDIR /app
 
