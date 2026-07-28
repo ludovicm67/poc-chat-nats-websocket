@@ -116,6 +116,11 @@ npm run test:smoke
   stack and runs the smoke check against it. Container logs are dumped on
   failure.
 
+[`.github/dependabot.yml`](.github/dependabot.yml) keeps the npm packages, the
+workflow actions, the Dockerfile base images and the images pinned in
+`compose.yaml` up to date, weekly. Every change it proposes goes through the CI
+above.
+
 ### Layout
 
 ```

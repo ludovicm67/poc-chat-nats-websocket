@@ -1,0 +1,60 @@
+version: 2
+
+updates:
+  # npm. The workspace has a single lockfile at the root, so one entry covers
+  # shared/, server/ and both services.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # The NATS client is split across several packages that are released
+      # together; bumping them separately would produce mismatched versions.
+      nats:
+        patterns:
+          - "@nats-io/*"
+      npm-minor-and-patch:
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: npm
+
+  # Actions used by the CI workflow. These move as a set, so one PR is enough.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: ci
+
+  # Base images. Each Dockerfile lives in its own directory, and the three Node
+  # ones must stay on the same version, hence the group.
+  - package-ecosystem: docker
+    directories:
+      - /client
+      - /server
+      - /services/capslock_mode
+      - /services/happy
+    schedule:
+      interval: weekly
+    groups:
+      base-images:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: docker
+
+  # Images pinned in compose.yaml (the NATS server). This is a distinct
+  # ecosystem from `docker`, which only reads Dockerfiles.
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: docker
