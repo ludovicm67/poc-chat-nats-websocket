@@ -1,54 +1,88 @@
 services:
-  # Messages bus
+  # Message bus.
+  #
+  # This used to be `nats-streaming` (STAN). That project reached end of life
+  # and its Docker image is deprecated: the durable-messaging features now live
+  # in the regular NATS server behind the `--jetstream` flag, so there is no
+  # cluster id to configure any more.
   nats:
     restart: always
-    image: nats-streaming
+    image: nats:2.14-alpine
     command:
-      - --cluster_id=cluster-test
+      - --jetstream
+      - --store_dir=/data
       - --http_port=8222
     ports:
       - 4222:4222
       - 6222:6222
       - 8222:8222
+    volumes:
+      - nats-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8222/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
 
-  # Server
+  # WebSocket gateway.
   server:
     restart: always
-    build: server
+    build:
+      context: .
+      dockerfile: server/Dockerfile
     ports:
       - 3001:3001
     environment:
       - SERVER_PORT=3001
       - NATS_SERVERS=nats://nats:4222
-      - CLUSTER_NAME=cluster-test
     depends_on:
-      - nats
+      nats:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3001/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
 
-  # Client
+  # Static web client.
   client:
     restart: always
-    build: client
+    build:
+      context: .
+      dockerfile: client/Dockerfile
     ports:
       - 3000:80
     environment:
+      # Where the browser reaches the gateway. Leave unset to derive it from
+      # the page location.
       - WEBSOCKET_URL=ws://127.0.0.1:3001
 
-  # Services
-  service_capslock_mode:
-    restart: always
-    build: services/capslock_mode
-    environment:
-      - NATS_SERVERS=nats://nats:4222
-      - CLUSTER_NAME=cluster-test
-      - CHANNEL_NAME=service.capslock_mode
-    depends_on:
-      - server
+  # Pipeline services.
   service_happy:
     restart: always
-    build: services/happy
+    build:
+      context: .
+      dockerfile: services/happy/Dockerfile
     environment:
       - NATS_SERVERS=nats://nats:4222
-      - CLUSTER_NAME=cluster-test
       - CHANNEL_NAME=service.happy
     depends_on:
-      - server
+      nats:
+        condition: service_healthy
+
+  service_capslock_mode:
+    restart: always
+    build:
+      context: .
+      dockerfile: services/capslock_mode/Dockerfile
+    environment:
+      - NATS_SERVERS=nats://nats:4222
+      - CHANNEL_NAME=service.capslock_mode
+    depends_on:
+      nats:
+        condition: service_healthy
+
+volumes:
+  nats-data:

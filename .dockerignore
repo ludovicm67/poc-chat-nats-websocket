@@ -1,0 +1,9 @@
+**/node_modules
+**/npm-debug.log*
+.git
+.gitignore
+.editorconfig
+**/*.test.js
+test/
+testing/
+README.md

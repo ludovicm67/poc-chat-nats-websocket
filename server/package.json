@@ -1,18 +1,13 @@
 {
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@poc/server",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "WebSocket gateway bridging browser clients to NATS",
   "main": "index.js",
+  "license": "MIT",
   "dependencies": {
-    "nats": "^1.3.0",
-    "node-nats-streaming": "^0.2.6",
-    "uuid": "^3.3.3",
-    "websocket": "^1.0.30"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "MIT"
+    "@poc/shared": "*",
+    "ws": "^8.21.1"
+  }
 }

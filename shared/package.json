@@ -1,0 +1,16 @@
+{
+  "name": "@poc/shared",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared NATS plumbing and service pipeline logic",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@nats-io/jetstream": "^3.4.0",
+    "@nats-io/transport-node": "^3.4.0"
+  }
+}

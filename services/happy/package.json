@@ -1,17 +1,12 @@
 {
-  "name": "service_happy",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@poc/service-happy",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Pipeline service appending a smiley to chat messages",
   "main": "index.js",
+  "license": "MIT",
   "dependencies": {
-    "nats": "^1.3.0",
-    "node-nats-streaming": "^0.2.6",
-    "uuid": "^3.3.3"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "MIT"
+    "@poc/shared": "*"
+  }
 }
