@@ -79,9 +79,10 @@ npm install
 ### Tests
 
 ```sh
-npm test         # everything
+npm test           # unit + end-to-end
 npm run test:unit  # pure logic only, no Docker needed
 npm run test:e2e   # full stack against a real NATS server
+npm run test:smoke # against a running `docker compose up` stack
 ```
 
 Unit tests cover subject validation, pipeline routing, the WebSocket protocol
@@ -89,12 +90,31 @@ and the client helpers. The end-to-end suite starts a throwaway JetStream
 server in Docker, boots the gateway and both services in-process, and drives
 them through a real WebSocket connection.
 
-If Docker is unavailable the end-to-end suite is skipped. Point it at an
-existing broker instead with:
+If Docker is unavailable the end-to-end suite is skipped locally, but fails on
+CI so a green build always means it actually ran. Point it at an existing
+broker instead with:
 
 ```sh
 NATS_TEST_URL=nats://127.0.0.1:4222 npm run test:e2e
 ```
+
+The smoke check drives the real images through their published ports, which is
+what catches Dockerfile, compose and entrypoint regressions:
+
+```sh
+docker compose up -d --wait
+npm run test:smoke
+```
+
+### CI
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push:
+
+* **tests** — unit and end-to-end suites on the current LTS (`lts/*`) and the
+  previous one (`lts/-1`), which keeps the `engines` floor honest.
+* **docker stack** — validates the compose file, builds every image, starts the
+  stack and runs the smoke check against it. Container logs are dumped on
+  failure.
 
 ### Layout
 

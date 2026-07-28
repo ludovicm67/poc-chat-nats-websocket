@@ -9,13 +9,24 @@ import { happy } from '@poc/service-happy/transform.js';
 import { dockerAvailable, startNatsContainer } from '../testing/nats-container.js';
 import { openClient, settle } from '../testing/ws-client.js';
 
+const skip = process.env.NATS_TEST_URL ? false : !(await dockerAvailable());
+
+// Skipping is a local-dev convenience. On CI it would mean a green build with
+// no end-to-end coverage at all, so fail loudly there instead.
+//
+// This check has to sit at module scope: a throw inside the `describe` callback
+// is reported but does not set a non-zero exit code, so CI would still pass.
+if (skip && process.env.CI) {
+  throw new Error(
+    'Docker is required to run the end-to-end suite on CI (or set NATS_TEST_URL)',
+  );
+}
+
 /**
  * Full-stack test: a real NATS server with JetStream, the real gateway, and
  * both pipeline services, driven through a real WebSocket connection.
  */
-describe('chat end to end', { timeout: 120_000 }, async () => {
-  const skip = process.env.NATS_TEST_URL ? false : !(await dockerAvailable());
-
+describe('chat end to end', { timeout: 120_000 }, () => {
   let container;
   let nc;
   let chat;

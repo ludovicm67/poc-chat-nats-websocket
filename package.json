@@ -14,6 +14,7 @@
     "test": "node --test",
     "test:unit": "node --test \"shared/*.test.js\" \"server/*.test.js\" \"services/*/*.test.js\" \"client/*.test.js\"",
     "test:e2e": "node --test \"test/*.test.js\"",
+    "test:smoke": "node testing/smoke.js",
     "test:coverage": "node --test --experimental-test-coverage"
   },
   "engines": {
