@@ -6,6 +6,6 @@ FROM nginx:1.30-alpine
 COPY client/docker-entrypoint.d/40-write-config.sh /docker-entrypoint.d/40-write-config.sh
 RUN chmod +x /docker-entrypoint.d/40-write-config.sh
 
-COPY client/index.html client/app.js client/protocol.js /usr/share/nginx/html/
+COPY client/index.html client/styles.css client/app.js client/protocol.js /usr/share/nginx/html/
 
 EXPOSE 80

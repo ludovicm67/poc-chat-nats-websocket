@@ -28,7 +28,13 @@ browser ──ws──► server ──JetStream──► service_happy ──Je
   its own `service.<name>` subject, transforms the payload and forwards it to
   the next step. The last step publishes the result to `channel.<name>`, where
   every connected client picks it up.
-* **`client`** — static page served by nginx.
+* **`client`** — static page served by nginx. No build step, no dependencies.
+
+Each client tab attaches an opaque `sender` id to the frames it sends. The
+services only ever rewrite `content`, so any other field rides through the
+pipeline untouched and comes back to everyone — which is how the UI tells your
+own messages apart. It is a display hint only: the server neither reads nor
+trusts it.
 
 Two kinds of delivery are used on purpose: chat fan-out is ephemeral, so it
 goes over **core NATS**; the service pipeline needs at-least-once handoff, so it

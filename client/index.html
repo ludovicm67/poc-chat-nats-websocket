@@ -4,16 +4,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>POC: chat using NATS + WebSockets</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>💬</text></svg>">
 </head>
 <body>
-  <div>
-    <h1>Channel <small id="channel-name"></small></h1>
-    <div id="messages-list"></div>
-    <div>
-      <input id="send-input" type="text" placeholder="Enter your message here..." autofocus>
-      <button id="send-btn" type="button">Send</button>
-    </div>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar__identity">
+        <span class="topbar__mark" aria-hidden="true">#</span>
+        <div>
+          <h1 class="topbar__channel" id="channel-name">…</h1>
+          <p class="topbar__subtitle">NATS + WebSockets</p>
+        </div>
+      </div>
+
+      <div class="status" id="status" data-state="connecting">
+        <span class="status__dot" aria-hidden="true"></span>
+        <span class="status__label" id="status-label" role="status">Connecting…</span>
+      </div>
+    </header>
+
+    <main class="messages" id="messages-list" role="log" aria-live="polite" aria-label="Messages">
+      <p class="messages__empty" id="empty-state">
+        Nothing here yet — say hello and watch it travel through the service pipeline.
+      </p>
+    </main>
+
+    <form class="composer" id="composer" autocomplete="off">
+      <label class="sr-only" for="send-input">Message</label>
+      <input
+        class="composer__input"
+        id="send-input"
+        type="text"
+        placeholder="Type a message…"
+        autocomplete="off"
+        autofocus
+      >
+      <button class="composer__send" id="send-btn" type="submit">
+        <span class="sr-only">Send message</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M3.4 20.4 21 12 3.4 3.6 3.4 10.2 15.6 12 3.4 13.8z" fill="currentColor"/>
+        </svg>
+      </button>
+    </form>
   </div>
+
   <script type="module" src="app.js"></script>
 </body>
 </html>

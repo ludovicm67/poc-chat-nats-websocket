@@ -11,9 +11,16 @@ export const channelFromHash = (hash) => {
   return name === '' ? DEFAULT_CHANNEL : name;
 };
 
-/** Builds the JSON frame sent to the gateway. */
-export const buildOutgoing = (type, channel, content) =>
-  JSON.stringify({ type, channel, content });
+/**
+ * Builds the JSON frame sent to the gateway.
+ *
+ * `sender` rides along untouched: the services only ever rewrite `content`, so
+ * whatever else is on the frame survives the whole pipeline and comes back to
+ * every client. That is what lets the UI tell your own messages apart without
+ * the server having to know about identities.
+ */
+export const buildOutgoing = (type, channel, content, sender) =>
+  JSON.stringify({ type, channel, content, sender });
 
 /**
  * Parses a frame coming back from the gateway.
@@ -33,13 +40,53 @@ export const parseIncoming = (raw) => {
   return data;
 };
 
-/** Renders an incoming frame as the line to display, or `null` to skip it. */
-export const describe = (data) => {
-  switch (data?.type) {
+/** Short, readable label for an opaque sender id. */
+export const senderLabel = (sender) => {
+  if (typeof sender !== 'string' || sender === '') return 'anon';
+  return sender.replaceAll('-', '').slice(0, 4);
+};
+
+/** Deterministic hue, so a sender keeps the same colour for everyone. */
+export const senderHue = (sender) => {
+  const text = typeof sender === 'string' ? sender : '';
+  let hash = 0;
+  for (let i = 0; i < text.length; i += 1) {
+    hash = (hash * 31 + text.charCodeAt(i)) % 360;
+  }
+  return hash;
+};
+
+/** `HH:MM` in local time. Deterministic, unlike a locale-formatted string. */
+export const formatTime = (date) =>
+  `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+
+/**
+ * Turns an incoming frame into everything the view needs to render it, or
+ * `null` when the frame should be ignored.
+ *
+ * @returns {{kind: 'notice', text: string}
+ *   | {kind: 'message', text: string, isOwn: boolean, label: string, hue: number}
+ *   | null}
+ */
+export const toDisplayMessage = (data, selfId) => {
+  if (data === null || typeof data !== 'object') return null;
+
+  const isOwn = typeof data.sender === 'string' && data.sender === selfId;
+
+  switch (data.type) {
     case 'join':
-      return 'Someone joined the channel!';
+      return {
+        kind: 'notice',
+        text: isOwn ? 'You joined the channel' : `${senderLabel(data.sender)} joined the channel`,
+      };
     case 'message':
-      return `someone: ${data.content}`;
+      return {
+        kind: 'message',
+        text: String(data.content ?? ''),
+        isOwn,
+        label: isOwn ? 'You' : senderLabel(data.sender),
+        hue: senderHue(data.sender),
+      };
     default:
       return null;
   }
